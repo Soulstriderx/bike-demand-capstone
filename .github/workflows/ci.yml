@@ -18,4 +18,4 @@ jobs:
       - name: Run smoke tests
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: pytest tests/ -v
+        run: python -m pytest tests/ -v
