@@ -83,7 +83,6 @@ def main() -> None:
                 ][x - 1])
                 season = st.selectbox("Season", [1, 2, 3, 4],
                                         format_func=lambda x: ["Winter", "Spring", "Summer", "Fall"][x - 1])
-                yr = st.selectbox("Year", [0, 1], format_func=lambda x: "2011" if x == 0 else "2012")
 
             with cols[1]:
                 weekday = st.selectbox("Day of week", range(0, 7),
@@ -105,7 +104,7 @@ def main() -> None:
 
         if submitted:
             inputs = {
-                "season": season, "yr": yr, "mnth": mnth, "hr": hr,
+                "season": season, "yr": 1, "mnth": mnth, "hr": hr,
                 "holiday": int(holiday), "weekday": weekday,
                 "workingday": int(workingday), "weathersit": weathersit,
                 "temp": temp, "atemp": atemp, "hum": hum, "windspeed": windspeed,
