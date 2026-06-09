@@ -52,9 +52,14 @@ def main() -> None:
             st.plotly_chart(fig1, use_container_width=True)
 
         with col2:
-            fig2 = px.scatter(df, x="temp", y="cnt", color="season",
-                                title="Demand vs Temperature (by season)",
-                                labels={"temp": "Temperature (norm.)", "cnt": "Rentals"})
+            df_seasons = df.copy()
+            df_seasons["season"] = df_seasons["season"].map({
+                1: "Winter", 2: "Spring", 3: "Summer", 4: "Fall"
+            })
+            fig2 = px.scatter(df_seasons, x="temp", y="cnt", color="season",
+                              title="Demand vs Temperature (by season)",
+                              labels={"temp": "Temperature (norm.)", "cnt": "Rentals",
+                                      "season": "Season"})
             st.plotly_chart(fig2, use_container_width=True)
 
         fig3 = px.box(df, x="weathersit", y="cnt",
