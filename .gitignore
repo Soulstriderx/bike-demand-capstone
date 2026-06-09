@@ -6,7 +6,7 @@ venv/
 .pytest_cache/
 
 # MLflow (commit screenshots in MODEL_CARD.md instead if mlruns is large)
-# mlruns/
+mlruns/
 
 # OS / editor
 .DS_Store
@@ -16,3 +16,6 @@ venv/
 # Secrets — NEVER commit tokens
 .env
 *.token
+
+# Model files — hosted on Hugging Face Hub instead
+models/

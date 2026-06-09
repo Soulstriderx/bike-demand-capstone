@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import List
 
+import numpy as np
 import pandas as pd
 
 #: Columns that leak the target. `casual + registered == cnt`, and both are only known
@@ -27,12 +28,12 @@ def load_and_clean(path: str) -> pd.DataFrame:
     """Load the raw hourly CSV and return a clean DataFrame.
 
     Must:
-      - read the CSV at ``path``,
-      - parse ``dteday`` to datetime,
-      - drop ``LEAKAGE_COLUMNS``,
-      - impute missing ``hum`` / ``windspeed`` (do NOT drop those rows wholesale),
-      - remove duplicate rows,
-      - return a DataFrame that still contains ``TARGET``.
+        - read the CSV at ``path``,
+        - parse ``dteday`` to datetime,
+        - drop ``LEAKAGE_COLUMNS``,
+        - impute missing ``hum`` / ``windspeed`` (do NOT drop those rows wholesale),
+        - remove duplicate rows,
+        - return a DataFrame that still contains ``TARGET``.
 
     Args:
         path: Path to ``hour.csv`` (or the bundled sample CSV).
@@ -40,17 +41,22 @@ def load_and_clean(path: str) -> pd.DataFrame:
     Returns:
         Cleaned DataFrame with no leakage columns.
     """
-    # TODO: implement (use pandas: read_csv, to_datetime, fillna, drop_duplicates, drop)
-    raise NotImplementedError
+    df = pd.read_csv(path)
+    df["dteday"] = pd.to_datetime(df["dteday"])
+    df = df.drop(columns=LEAKAGE_COLUMNS)
+    df["hum"] = df["hum"].fillna(df["hum"].median())
+    df["windspeed"] = df["windspeed"].fillna(df["windspeed"].median())
+    df = df.drop_duplicates()
+    return df
 
 
 def add_features(df: pd.DataFrame) -> pd.DataFrame:
     """Engineer datetime and cyclical features from a cleaned DataFrame.
 
     Suggested features:
-      - ``dayofweek`` / ``is_weekend`` from ``dteday``,
-      - cyclical encodings of ``hr`` and ``mnth`` (sin/cos),
-      - keep weather features (``temp``, ``atemp``, ``hum``, ``windspeed``, ``weathersit``).
+        - ``dayofweek`` / ``is_weekend`` from ``dteday``,
+        - cyclical encodings of ``hr`` and ``mnth`` (sin/cos),
+        - keep weather features (``temp``, ``atemp``, ``hum``, ``windspeed``, ``weathersit``).
 
     Args:
         df: Output of :func:`load_and_clean`.
@@ -58,5 +64,11 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame with engineered feature columns added.
     """
-    # TODO: implement
-    raise NotImplementedError
+    df = df.copy()
+    df["dayofweek"] = df["dteday"].dt.dayofweek
+    df["is_weekend"] = (df["dayofweek"] >= 5).astype(int)
+    df["hr_sin"] = np.sin(2 * np.pi * df["hr"] / 24)
+    df["hr_cos"] = np.cos(2 * np.pi * df["hr"] / 24)
+    df["mnth_sin"] = np.sin(2 * np.pi * df["mnth"] / 12)
+    df["mnth_cos"] = np.cos(2 * np.pi * df["mnth"] / 12)
+    return df
